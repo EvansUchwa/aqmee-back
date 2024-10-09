@@ -4,6 +4,7 @@ const {
   dynamicStorage,
   serveStorageFiles,
   getFileTypeFromMimeType,
+  deleteFileFromStorage,
 } = require("../helpers/storage");
 const MediaFile = require("../models/MediaFile");
 const UserReview = require("../models/UserReview");

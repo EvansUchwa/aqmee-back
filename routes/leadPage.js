@@ -121,6 +121,19 @@ router.post("/add-reviews", async (req, res) => {
   res.send(newC);
 });
 
+router.post("/add-button", async (req, res) => {
+  const allContent = await LeadPageContent.find();
+  const lastOrder = getLastMaxOrder(allContent);
+  const { buttonText, buttonLink } = req.body;
+  const newC = await LeadPageContent.create({
+    contentType: "button",
+    buttonText,
+    buttonLink,
+    order: lastOrder + 1,
+  });
+  res.send(newC);
+});
+
 router.get("/all", async (req, res) => {
   const newC = await LeadPageContent.find()
     .populate("gallery")
@@ -128,8 +141,41 @@ router.get("/all", async (req, res) => {
   res.json(newC);
 });
 
+router.put("/up-order/:contentId", async (req, res) => {
+  const findContent = await LeadPageContent.findById(req.params.contentId);
+  const findPrevContent = await LeadPageContent.findOneAndUpdate(
+    { order: findContent.order - 1 },
+    {
+      order: findContent.order,
+    }
+  );
+  findContent.order = findPrevContent.order;
+  await findContent.save();
+
+  res.json(true);
+});
+
+router.put("/down-order/:contentId", async (req, res) => {
+  const findContent = await LeadPageContent.findById(req.params.contentId);
+  const findNextContent = await LeadPageContent.findOneAndUpdate(
+    { order: findContent.order + 1 },
+    {
+      order: findContent.order,
+    }
+  );
+  findContent.order = findNextContent.order;
+  await findContent.save();
+
+  res.json(true);
+});
+
 router.delete("/delete/:contentId", async (req, res) => {
   const deleteC = await LeadPageContent.findByIdAndDelete(req.params.contentId);
+  const allC = await LeadPageContent.find();
+  for (let k = 0; k < allC.length; k++) {
+    const element = allC[k];
+    await LeadPageContent.findByIdAndUpdate(element._id, { order: k + 1 });
+  }
   res.json(deleteC);
 });
 

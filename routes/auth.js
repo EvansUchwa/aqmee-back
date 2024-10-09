@@ -2,8 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
+const bcrypt = require("bcryptjs");
 
 var jwt = require("jsonwebtoken");
 const { middleware } = require("../middleware");
@@ -44,6 +43,24 @@ router.get("/user", middleware, async (req, res) => {
   try {
     const { id, grade } = req.userConnected;
     const user = await User.findById(id);
+    res.send(user);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: true });
+  }
+});
+
+router.put("/update-user", middleware, async (req, res) => {
+  try {
+    const { id, grade } = req.userConnected;
+    const { password, email, name } = req.body;
+
+    let finalBody = { email, name };
+    if (password) {
+      const hashPass = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+      finalBody.password = hashPass;
+    }
+    const user = await User.findByIdAndUpdate(id, finalBody);
     res.send(user);
   } catch (error) {
     console.log(error);

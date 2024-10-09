@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const contentTypeEnum = ["gallery", "video", "paragraph", "reviews"];
+const contentTypeEnum = ["gallery", "video", "paragraph", "reviews", "button"];
 
 const leadPageContentSchema = new Schema(
   {
@@ -47,6 +47,24 @@ const leadPageContentSchema = new Schema(
       type: Boolean,
       required: function () {
         if (this.contentType == "reviews") {
+          return true;
+        }
+        return false;
+      },
+    },
+    buttonText: {
+      type: String,
+      required: function () {
+        if (this.contentType == "button") {
+          return true;
+        }
+        return false;
+      },
+    },
+    buttonLink: {
+      type: String,
+      required: function () {
+        if (this.contentType == "button") {
           return true;
         }
         return false;

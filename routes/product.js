@@ -76,6 +76,13 @@ router.get("/all", async (req, res) => {
   res.send(products);
 });
 
+router.get("/:productId", async (req, res) => {
+  const product = await Product.findById(req.params.productId).populate(
+    "pictures"
+  );
+  res.send(product);
+});
+
 router.delete("/delete/:productId", async (req, res) => {
   const findP = await Product.findById(req.params.productId).populate(
     "pictures"
