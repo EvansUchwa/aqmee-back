@@ -10,8 +10,6 @@ function middleware(req, res, next) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userConnected = decoded;
 
-    console.log(req.userConnected);
-
     // if (req.userConnected.grade == "superAdmin") {
     //   next();
     // } else {

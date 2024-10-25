@@ -1,7 +1,14 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const contentTypeEnum = ["gallery", "video", "paragraph", "reviews", "button"];
+const contentTypeEnum = [
+  "gallery",
+  "video",
+  "pdf",
+  "paragraph",
+  "reviews",
+  "button",
+];
 
 const leadPageContentSchema = new Schema(
   {
@@ -29,6 +36,26 @@ const leadPageContentSchema = new Schema(
       ref: "mediaFile",
       required: function () {
         if (this.contentType == "video") {
+          return true;
+        }
+        return false;
+      },
+    },
+    pdf: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "mediaFile",
+      required: function () {
+        if (this.contentType == "pdf") {
+          return true;
+        }
+        return false;
+      },
+    },
+    pdfImage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "mediaFile",
+      required: function () {
+        if (this.contentType == "pdf") {
           return true;
         }
         return false;

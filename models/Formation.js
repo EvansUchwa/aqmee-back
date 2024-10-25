@@ -7,6 +7,10 @@ const schema = new Schema(
       type: String,
       required: false,
     },
+    stripeLink: {
+      type: String,
+      required: false,
+    },
     price: {
       type: Number,
       required: true,

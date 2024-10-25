@@ -20,26 +20,29 @@ router.post(
   ]),
   async (req, res) => {
     const { autorName, text } = req.body;
-    if (req.files.autorPicture && req.files.audioOrVideo) {
+    const finalBody = { autorName, text };
+    if (req.files.autorPicture) {
       let userPicture = req.files.autorPicture[0];
-      let audioOrVideo = req.files.audioOrVideo[0];
       let userPictureSave = await MediaFile.create({
         url: serveStorageFiles(userPicture.destination, userPicture.filename),
         filename: userPicture.filename,
         type: getFileTypeFromMimeType(userPicture.mimetype),
       });
-      let audioOrVideoSave = await MediaFile.create({
-        url: serveStorageFiles(audioOrVideo.destination, audioOrVideo.filename),
-        filename: audioOrVideo.filename,
-        type: getFileTypeFromMimeType(audioOrVideo.mimetype),
-      });
+      finalBody.autorPicture = userPictureSave._id;
+      if (req.files.audioOrVideo) {
+        let audioOrVideo = req.files.audioOrVideo[0];
+        let audioOrVideoSave = await MediaFile.create({
+          url: serveStorageFiles(
+            audioOrVideo.destination,
+            audioOrVideo.filename
+          ),
+          filename: audioOrVideo.filename,
+          type: getFileTypeFromMimeType(audioOrVideo.mimetype),
+        });
+        finalBody.audioOrVideo = audioOrVideoSave._id;
+      }
 
-      const newreview = await UserReview.create({
-        autorName,
-        text,
-        autorPicture: userPictureSave._id,
-        audioOrVideo: audioOrVideoSave._id,
-      });
+      const newreview = await UserReview.create(finalBody);
       res.send(newreview);
     } else {
       res.status(400).json({ noFileFound: true });
@@ -81,7 +84,7 @@ router.put(
           filename: audioOrVideo.filename,
           type: getFileTypeFromMimeType(audioOrVideo.mimetype),
         });
-        finalBody.audioOrVideo = userPictureSave._id;
+        finalBody.audioOrVideo = audioOrVideoSave._id;
       }
     }
 
@@ -105,8 +108,8 @@ router.delete("/delete/:reviewId", async (req, res) => {
     .populate("audioOrVideo")
     .populate("autorPicture");
 
-  deleteFileFromStorage("/reviews/" + findP.audioOrVideo.filename);
-  deleteFileFromStorage("/autorPictures/" + findP.autorPicture.filename);
+  // deleteFileFromStorage("/reviews/" + findP.audioOrVideo.filename);
+  // deleteFileFromStorage("/autorPictures/" + findP.autorPicture.filename);
   const deleteReview = await UserReview.findByIdAndDelete(req.params.reviewId);
   res.send(deleteReview);
 });

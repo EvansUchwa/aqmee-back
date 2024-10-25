@@ -54,6 +54,19 @@ router.post("/add-paragraph", async (req, res) => {
   }
 });
 
+router.put("/update-paragraph/:paragraphId", async (req, res) => {
+  const { paragraph } = req.body;
+  if (paragraph) {
+    const upP = await LeadPageContent.findByIdAndUpdate(
+      req.params.paragraphId,
+      req.body
+    );
+    res.send(upP);
+  } else {
+    res.status(400).json({ noFileFound: true });
+  }
+});
+
 router.post(
   "/add-gallery",
   upload.fields([{ name: "otherMedias", maxCount: 10 }]),
@@ -110,6 +123,42 @@ router.post(
   }
 );
 
+router.post(
+  "/add-pdf",
+  upload.fields([
+    { name: "otherMedias", maxCount: 1 },
+    { name: "documents", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    if (req.files.otherMedias && req.files.documents) {
+      const allContent = await LeadPageContent.find();
+      const lastOrder = getLastMaxOrder(allContent);
+      const video = req.files.otherMedias[0];
+      const documents = req.files.documents[0];
+      let saveMedia = await MediaFile.create({
+        url: serveStorageFiles(video.destination, video.filename),
+        filename: video.filename,
+        type: getFileTypeFromMimeType(video.mimetype),
+      });
+      let saveDoc = await MediaFile.create({
+        url: serveStorageFiles(documents.destination, documents.filename),
+        filename: documents.filename,
+        type: getFileTypeFromMimeType(documents.mimetype),
+      });
+
+      const newC = await LeadPageContent.create({
+        contentType: "pdf",
+        pdf: saveDoc._id,
+        pdfImage: saveMedia._id,
+        order: lastOrder + 1,
+      });
+      res.send(newC);
+    } else {
+      res.status(400).json({ noFileFound: true });
+    }
+  }
+);
+
 router.post("/add-reviews", async (req, res) => {
   const allContent = await LeadPageContent.find();
   const lastOrder = getLastMaxOrder(allContent);
@@ -137,6 +186,8 @@ router.post("/add-button", async (req, res) => {
 router.get("/all", async (req, res) => {
   const newC = await LeadPageContent.find()
     .populate("gallery")
+    .populate("pdf")
+    .populate("pdfImage")
     .populate("video");
   res.json(newC);
 });

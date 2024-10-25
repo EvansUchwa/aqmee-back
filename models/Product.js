@@ -44,6 +44,10 @@ const schema = new Schema(
       type: String,
       required: true,
     },
+    markets: {
+      type: Array,
+      required: true,
+    },
   },
   { timestamps: true }
 );

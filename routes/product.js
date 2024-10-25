@@ -32,7 +32,7 @@ router.post(
       }
       let createProduct = await Product.create({
         ...req.body,
-        productNumber: uniqid.time(),
+        // productNumber: uniqid.time(),
         pictures: allPicturesIdArray,
       });
 
@@ -90,7 +90,7 @@ router.delete("/delete/:productId", async (req, res) => {
   const deleteReview = await Product.findByIdAndDelete(req.params.productId);
   for (let i = 0; i < findP.pictures.length; i++) {
     const element = findP.pictures[i];
-    deleteFileFromStorage("/products/" + element.filename);
+    // deleteFileFromStorage("/products/" + element.filename);
   }
   res.send(deleteReview);
 });

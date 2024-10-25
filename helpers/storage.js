@@ -8,6 +8,7 @@ var productsDir = "./Storage/products";
 var reviewDir = "./Storage/reviews";
 var userPicDir = "./Storage/autorPictures";
 var otherMediasDir = "./Storage/otherMedias";
+var documentsDir = "./Storage/documents";
 
 const reviewStorage = makeMulterStorage(reviewDir);
 const userPicStorage = makeMulterStorage(userPicDir);
@@ -58,6 +59,7 @@ const dynamicStorage = multer.diskStorage({
     createDirectoryIfNotExist(userPicDir);
     createDirectoryIfNotExist(productsDir);
     createDirectoryIfNotExist(otherMediasDir);
+    createDirectoryIfNotExist(documentsDir);
 
     if (file.fieldname === "audioOrVideo") {
       cb(null, reviewDir);
@@ -67,6 +69,8 @@ const dynamicStorage = multer.diskStorage({
       cb(null, productsDir);
     } else if (file.fieldname === "otherMedias") {
       cb(null, otherMediasDir);
+    } else if (file.fieldname === "documents") {
+      cb(null, documentsDir);
     } else {
       cb(new Error("Invalid fieldname"));
     }

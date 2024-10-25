@@ -4,13 +4,14 @@ const router = express.Router();
 
 router.post("/add", async (req, res) => {
   try {
-    const { name, price, time, details } = req.body;
+    const { name, price, time, details, stripeLink } = req.body;
     if (name && price && time && details) {
       const newFormation = await Formations.create({
         name,
         price,
         time,
         details,
+        stripeLink,
       });
       res.send("Formation ajouter");
     } else {
